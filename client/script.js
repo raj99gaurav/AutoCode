@@ -8,6 +8,7 @@ const chatContainer = document.querySelector("#chat_container");
 
 let loadInterval;
 
+//AI thinking ...
 function loader(element) {
   element.textContent = "";
 
@@ -18,4 +19,19 @@ function loader(element) {
       element.textContent = "";
     }
   }, 300);
+}
+
+//Function to print the output from AI letter by letter -> Better User exp
+
+function typeText(element, text) {
+  let index = 0;
+
+  let interval = setInterval(() => {
+    //check if we are still typing
+    if (index < text.length) {
+      element.innerHTML += text.chartAt(index); //will get char at specific index
+    } else {
+      clearInterval(interval);
+    }
+  }, 20);
 }
