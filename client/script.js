@@ -1,35 +1,31 @@
 import bot from "./assets/bot.svg";
 import user from "./assets/user.svg";
 
-//as we are not using react this time we have to target html elements manually
-
 const form = document.querySelector("form");
 const chatContainer = document.querySelector("#chat_container");
 
 let loadInterval;
 
-//AI thinking ...
 function loader(element) {
   element.textContent = "";
 
   loadInterval = setInterval(() => {
+    // Update the text content of the loading indicator
     element.textContent += ".";
 
+    // If the loading indicator has reached three dots, reset it
     if (element.textContent === "....") {
       element.textContent = "";
     }
   }, 300);
 }
 
-//Function to print the output from AI letter by letter -> Better User exp
-
 function typeText(element, text) {
   let index = 0;
 
   let interval = setInterval(() => {
-    //check if we are still typing
     if (index < text.length) {
-      element.innerHTML += text.charAt(index); //will get char at specific index
+      element.innerHTML += text.charAt(index);
       index++;
     } else {
       clearInterval(interval);
@@ -37,9 +33,10 @@ function typeText(element, text) {
   }, 20);
 }
 
-//function to create unique ids to  map to msgs
+// generate unique ID for each message div of bot
+// necessary for typing text effect for that specific reply
+// without unique ID, typing text will work on every element
 function generateUniqueId() {
-  //using current time and date
   const timestamp = Date.now();
   const randomNumber = Math.random();
   const hexadecimalString = randomNumber.toString(16);
@@ -47,47 +44,46 @@ function generateUniqueId() {
   return `id-${timestamp}-${hexadecimalString}`;
 }
 
-//function to implement chat stripe
-
 function chatStripe(isAi, value, uniqueId) {
   return `
-  <div class="wrapper ${isAi && "ai"}">
-    <div class="chat">
-      <div class ="profile">
-        <img scr="${isAi ? bot : user}" alt="${isAi ? "bot" : "user"}"/>
-      </div>
-      <div class="message" id=${uniqueId}>${value}</div>
-    </div>
-  </div>  `;
+        <div class="wrapper ${isAi && "ai"}">
+            <div class="chat">
+                <div class="profile">
+                    <img 
+                      src=${isAi ? bot : user} 
+                      alt="${isAi ? "bot" : "user"}" 
+                    />
+                </div>
+                <div class="message" id=${uniqueId}>${value}</div>
+            </div>
+        </div>
+    `;
 }
-
-//Handle submit function to trigger AI generated response
 
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  //get the date that we typed into the form
   const data = new FormData(form);
 
-  //user's chat stripe
+  // user's chatstripe
   chatContainer.innerHTML += chatStripe(false, data.get("prompt"));
 
+  // to clear the textarea input
   form.reset();
 
-  //bot's chat stripe
+  // bot's chatstripe
   const uniqueId = generateUniqueId();
-  chatContainer.innerHTML += chatStripe(true, " ", uniqueId); //empty string as we will fill it up later
+  chatContainer.innerHTML += chatStripe(true, " ", uniqueId);
 
-  //put the new msg in view by scrolling
+  // to focus scroll to the bottom
   chatContainer.scrollTop = chatContainer.scrollHeight;
 
-  //fetch the newely created div
+  // specific message div
   const messageDiv = document.getElementById(uniqueId);
 
-  //turn on the loader
+  // messageDiv.innerHTML = "..."
   loader(messageDiv);
 
-  //fetch data from server -> bot's response
   const response = await fetch("https://autocode.onrender.com", {
     method: "POST",
     headers: {
@@ -99,28 +95,24 @@ const handleSubmit = async (e) => {
   });
 
   clearInterval(loadInterval);
-  messageDiv.innerHTML = "";
+  messageDiv.innerHTML = " ";
 
   if (response.ok) {
     const data = await response.json();
-    const parsedData = data.bot.trim();
+    const parsedData = data.bot.trim(); // trims any trailing spaces/'\n'
 
     typeText(messageDiv, parsedData);
   } else {
     const err = await response.text();
+
     messageDiv.innerHTML = "Something went wrong";
     alert(err);
   }
 };
 
-//holding the handleSubmit function
-
 form.addEventListener("submit", handleSubmit);
-
-//also submit on enter
 form.addEventListener("keyup", (e) => {
   if (e.keyCode === 13) {
-    //if enter key is pressed
     handleSubmit(e);
   }
 });
