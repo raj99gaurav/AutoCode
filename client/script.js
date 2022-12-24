@@ -59,3 +59,30 @@ function chatStripe(isAi, value, uniqueId) {
     </div>
   </div>  `;
 }
+
+//Handle submit function to trigger AI generated response
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  //get the date that we typed into the form
+  const data = new formData(form);
+
+  //user's chat stripe
+  chatContainer.innerHTML += chatStripe(false, data.get("prompt"));
+
+  form.reset();
+
+  //bot's chat stripe
+  const uniqueId = generateUniqueId();
+  chatContainer.innerHTML += chatStripe(true, " ", uniqueId); //empty string as we will fill it up later
+
+  //put the new msg in view by scrolling
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+
+  //fetch the newely created div
+  const messageDiv = document.getElementById(uniqueId);
+
+  //turn on the loader
+  loader(messageDiv);
+};
