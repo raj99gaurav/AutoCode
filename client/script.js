@@ -86,3 +86,15 @@ const handleSubmit = async (e) => {
   //turn on the loader
   loader(messageDiv);
 };
+
+//holding the handleSubmit function
+
+form.addEventListener("submit", handleSubmit);
+
+//also submit on enter
+form.addEventListener("keyup", (e) => {
+  if (e.keyCode === 13) {
+    //if enter key is pressed
+    handleSubmit(e);
+  }
+});
