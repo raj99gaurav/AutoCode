@@ -50,6 +50,6 @@ app.post("/", async (req, res) => {
 });
 
 //making sure server always listens
-app.listen(5000, () =>
-  console.log("Server is rununning on port http://localhost:5000/")
+app.listen(3000, () =>
+  console.log("Server is rununning on port http://localhost:3000/")
 );
