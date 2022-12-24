@@ -15,7 +15,7 @@ function loader(element) {
   loadInterval = setInterval(() => {
     element.textContent += ".";
 
-    if (element.textContent === "...") {
+    if (element.textContent === "....") {
       element.textContent = "";
     }
   }, 300);
@@ -30,6 +30,7 @@ function typeText(element, text) {
     //check if we are still typing
     if (index < text.length) {
       element.innerHTML += text.chartAt(index); //will get char at specific index
+      index++;
     } else {
       clearInterval(interval);
     }
@@ -66,7 +67,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   //get the date that we typed into the form
-  const data = new formData(form);
+  const data = new FormData(form);
 
   //user's chat stripe
   chatContainer.innerHTML += chatStripe(false, data.get("prompt"));
